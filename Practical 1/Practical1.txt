@@ -1,0 +1,169 @@
+24June2025
+Note: 3 Data Analysis Report (each person in assignment)
+
+@C:\Users\admin\Desktop\Sample_NorthWind\01_table_setup.sql
+@C:\Users\admin\Desktop\Sample_NorthWind\02_NorthWind_Insert.sql
+@C:\Users\admin\Desktop\Sample_NorthWind\03_orders.sql
+@C:\Users\admin\Desktop\Sample_NorthWind\04_Orders_details.sql
+
+
+
+
+Question 1
+----------
+List customers’ whose total orders exceed 1,000 in any given year.
+///
+THE SEQUENCE OF QUERY
+1 = FROM (load data, which table?)
+2 = WHERE (filter data, simple filter)
+3 = GROUP BY (categorised data, group by all selected except aggregate function)
+4 = HAVING (filter data, Aggregate Function)
+5 = SELECT (Column)
+6 = ORDER BY (use it in last line to sort data)
+
+Table we need to select:
+ORDER_DEETAILS - Bridge
+ORDERS - Child
+CUSTOMER - Parent
+(Start from the Parent table first)
+
+quantity
+unitprice
+discount
+==> (quantity*unitprice) * (1 - discount)
+
+==> To know which year we select
+SELECT min(orderdate), max(orderdate)
+  2  from orders;
+///
+
+
+SELECT A.customerID, A.companyName,
+SUM((C.quantity * C.unitprice) * (1 - discount)) TOTAL_PURCHASE
+FROM Customers A
+JOIN Orders B
+ON A.customerID = B.customerID
+JOIN Order_Details C
+ON B.orderID = C.orderID
+WHERE EXTRACT(YEAR FROM B.orderdate) = 1995
+GROUP BY A.customerID, A.companyName
+HAVING SUM((C.quantity * C.unitprice) * (1 - discount)) > 1000
+ORDER BY TOTAL_PURCHASE DESC;
+
+
+
+
+Question 2
+----------
+Show details of the best selling category.
+///
+best selling --> total no of orders --> COUNT() --> HAVING
+expect --> 1 row of output
+
+Table that we need to select:
+1.categories
+2.products
+3.order_details
+4.orders
+
+///
+
+SELECT *
+FROM(
+SELECT A.categoryid, A.categoryname, COUNT(D.orderid) TOTAL_ORDER
+FROM categories A
+JOIN products B ON A.categoryid = B.categoryid
+JOIN order_details C ON B.productid = C.productid
+JOIN orders D ON C.orderid = D.orderid
+GROUP BY A.categoryid, A.categoryname
+ORDER BY TOTAL_ORDER DESC
+)
+WHERE ROWNUM = 1;
+
+
+==> if we want to select the top 3
+SELECT *
+FROM(
+SELECT A.categoryid, A.categoryname, COUNT(D.orderid) TOTAL_ORDER
+FROM categories A
+JOIN products B ON A.categoryid = B.categoryid
+JOIN order_details C ON B.productid = C.productid
+JOIN orders D ON C.orderid = D.orderid
+GROUP BY A.categoryid, A.categoryname
+ORDER BY TOTAL_ORDER DESC
+)
+WHERE ROWNUM <= 3;
+
+
+
+
+Question 3
+----------
+Which shipper handled the most orders?
+///
+most orders? --> COUNT(orderid)
+category --> shipper
+EXTRACT TOP 1 shipper --> ROWNUM = 1
+
+table selected:
+1.shippers
+2.orders
+
+///
+
+SELECT * 
+FROM(
+SELECT B.companyname, COUNT(A.orderid) TOTAL_ORDERS
+FROM orders A
+JOIN shippers B ON B.shipperid = A.shipvia
+GROUP BY B.companyname
+ORDER BY TOTAL_ORDERS DESC
+)
+WHERE ROWNUM = 1;
+
+
+
+
+Question 4
+-----------
+Are there any customers that did not make any orders in any given year? If so, when was the last purchase?
+///
+last purchase --> MAX(orderdate)
+
+Why we use set operators? 
+--> Set operators are used to combine or exclude the results of two or 
+more SELECT statement queries into a single result set.
+
+MINUS --> SET OPERATOR
+SIMPLE JOIN 
+LEFT JOIN
+NOT IN
+
+table selected:
+1.customer
+2.orders
+
+///
+
+SELECT DISTINCT(A.customerid), MAX(B.orderdate) LATEST_PURCHASE
+FROM customers A
+JOIN orders B ON A.customerid = B.customerid
+WHERE A.customerid IN
+ (SELECT customerid
+ FROM customers
+ MINUS
+ SELECT customerid
+ FROM orders
+ WHERE (EXTRACT (YEAR FROM orderdate)=1995))
+GROUP BY A.customerid;
+
+
+
+
+
+
+Q5) Which products are not popular? Provide the necessary information.
+///
+not popular --> product that orders below average
+
+///
