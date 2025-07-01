@@ -1,0 +1,104 @@
+-- Generate the new customer data from the existing customer table (app. 6000 customer) -- duplicatre records
+
+-- check the existing customer table
+desc customer
+(or)
+select * from customers;
+(or)
+select count(*) from customers;
+
+-- create a temporary customer table
+CREATE TABLE TEMP_CUST AS 
+ SELECT *
+ FROM CUSTOMERS;
+
+-- check temp_cust records
+select count(*) from TEMP_CUST;
+
+-- view all the table you created
+SELECT TABLE_NAME FROM TABS;
+
+-- view table constraint
+--format it
+COL SEARCH_CONDITION FORMAT A30 WRAPPED
+SET LINESIZE 100
+SET PAGESIZE 60
+/// make sure you rename your constraint, no SYS in your assignment ///
+DESC USER_CONS_COLUMNS
+(or)
+SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME
+FROM USER_CONS_COLUMNS;
+(or)
+DESC USER_CONSTRAINTS
+(or)
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, TABLE_NAME, SEARCH_CONDITION
+FROM USER_CONSTRAINTS;
+
+-- insert customers data into TEMP_CUST until 6000
+INSERT INTO TEMP_CUST
+ SELECT * FROM TEMP_CUST;
+
+SELECT COUNT(*) FROM TEMP_CUST;
+/// repeat this step until the TEMP_CUST have 6000 record ///
+
+-- create a NEW_CUST table
+DESC CUSTOMERS
+
+CREATE TABLE NEW_CUST
+(
+CUSTOMERID   NUMBER NOT NULL,
+COMPANYNAME  VARCHAR2(25) NOT NULL,
+CONTACTNAME  VARCHAR2(30),
+CONTACTTITLE VARCHAR2(30),
+CITY         VARCHAR2(15),
+REGION       VARCHAR2(15),
+POSTALCODE   VARCHAR2(10),
+COUNTRY      VARCHAR2(15),
+CONSTRAINT NEW_CUST_PK PRIMARY KEY(CUSTOMERID)
+);
+
+-- Genarate sequence for customerID
+CREATE SEQUENCE CUSTOMER_SEQ
+ START WITH 100001
+ INCREMENT BY 1;
+
+-- HOW TO VIEW ALL THE DICTIONARY YOU CREATED?
+DESC USER_OBJECTS
+
+-- to check have u created the sequence
+SELECT OBJECT_NAME, OBJECT_TYPE
+FROM USER_OBJECTS;
+
+-- HOW TO VIEW THE NEWXT VALUE OF THE SEQUENCE?
+SELECT CUSTOMER_SEQ.NEXTVAL
+FROM DUAL;
+
+-- HOW TO VIEW THE CURRENT VALUE OF THE SEQUENDCE?
+SELECT CUSTOMER_SEQ.CURRVAL
+FROM DUAL;
+
+-- HOW TO DROP THE SEQUENCE
+DROP SEQUENCE CUSTOMER_SEQ;
+
+-- Genarate sequence for customerID
+CREATE SEQUENCE CUSTOMER_SEQ
+ START WITH 100001
+ INCREMENT BY 1;
+
+-- insert data from TEMP_CUST to NEW_CUST
+DESC NEW_CUST
+
+INSERT INTO NEW_CUST
+ SELECT CUSTOMER_SEQ.NEXTVAL,
+        SUBSTR(COMPANYNAME,1,18) || '-' ||CUSTOMER_SEQ.CURRVAL,
+        CONTACTNAME,
+        CONTACTTITLE,
+        CITY,
+        REGION,
+        POSTALCODE,
+        COUNTRY
+FROM TEMP_CUST;
+
+-- check how many data NEW_CUST have
+SELECT CUSTOMERID, COMPANYNAME
+FROM NEW_CUST;
