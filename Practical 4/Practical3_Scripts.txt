@@ -1,0 +1,118 @@
+-- Generate a random decimal number between 10 and 100 (exclusive of 101)
+
+
+-- Generate one random value per row in CUSTOMERS table (testing randomness on multiple rows)
+
+
+-- Generate a random integer (TRUNC removes decimals) between 10 and 100
+
+
+-- Check the minimum and maximum customerID in new_cust (used to define the range of valid customer IDs)
+
+
+-- Generate a random customer ID by replacing yyyy with min ID and xxxx with max ID + 1
+
+
+-- Retrieve the company name of a randomly selected customer with ID from 1 to 6
+
+
+-- Retrieve customer ID and company name using a random customer ID within a given range
+
+
+-- Generate a random freight charge (rounded to 2 decimal places) between RM5.99 and RM99.99
+
+-- Drop the existing new_orders table if it exists
+
+
+-- Create the new_orders table to store synthetic order data
+
+  -- Unique order ID
+  -- Customer who placed the order
+  -- Employee handling the order
+  -- Date the order was placed
+  -- Date the customer requires the order
+  -- Date the order was shipped
+  -- Shipping method ID
+  -- Shipping cost
+  -- Primary key constraint
+  
+-- Drop the existing order sequence if it exists
+
+
+-- Create a sequence to generate ORDERID values starting from 100001
+
+
+-- Display current time to track script start
+
+
+-- Enable DBMS output for debugging
+
+-- Declare a PL/SQL block to generate orders for 10 years (from 01/01/2016 to 31/08/2025)
+
+  -- Starting date of order generation
+  -- Ending date
+
+  -- Number of orders to generate for a single day
+  -- Order ID (from sequence)
+  -- Randomly selected customer ID
+  -- Random employee ID (1–9)
+  -- Order date = current startDate
+  -- Required delivery date = orderDate + 7 days
+  -- Shipped date = orderDate + 3 days
+  -- Random shipper ID (1–6)
+  -- Random freight cost (RM5.99 – RM99.99)
+
+  -- Loop for each day in the date range
+  
+    -- Generate a random number of orders for the day (22 to 60 orders)
+    
+
+    -- Inner loop: generate v_max_orders for the current day
+    
+      -- Get the next order ID from sequence
+      
+
+      -- Generate random customer ID using actual customerID min & max (replace yyyy and xxxx)
+      
+
+      -- Generate random employee ID between 1 and 9
+      
+
+      -- Assign order date as the current loop date
+      
+
+      -- Required date = order date + 7 days
+      
+
+      -- Shipped date = order date + 3 days
+      
+
+      -- Generate random shipper ID (1–6)
+      
+
+      -- Generate random freight charge (RM5.99 – RM99.99)
+      
+
+      -- Insert generated order into new_orders table
+      
+
+    -- Move to the next day
+
+
+-- Display time after order generation completes
+
+
+-- Check how many customer records exist in the new_cust table
+
+
+-- Count how many unique customers actually placed orders
+
+
+-- Show order frequency per customer
+
+
+-- Group the number of customers by how many orders they placed
+
+
+
+

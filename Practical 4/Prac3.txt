@@ -1,0 +1,339 @@
+-- work we do in Practical 3:
+SET SERVEROUTPUT ON
+
+DECLARE
+  STARTDATE DATE := TO_DATE('30/06/2016','DD/MM/YYYY');
+  ENDDATE DATE := TO_DATE('01/07/2025','DD/MM/YYYY');
+  V_MAX_ORDERS    NUMBER(3);
+  V_ORDERID       NUMBER;
+  V_CUSTOMERID    NUMBER;
+  V_EMPLOYEEID    NUMBER;
+  V_ORDERDATE     DATE;
+  V_REQUIREDDATE  DATE;
+  V_SHIPPEDDATE   DATE;
+  V_SHIPVIA       NUMBER;
+  V_FREIGHT       NUMBER(6,2);
+  COUNTER         NUMBER := 0;
+BEGIN
+ WHILE (STARTDATE <= ENDDATE) LOOP
+    V_MAX_ORDERS := TRUNC(DBMS_RANDOM.VALUE(10,51));
+    FOR NO_OF_ORDERS IN 1..V_MAX_ORDERS LOOP
+        COUNTER := COUNTER + 1;
+        V_ORDERID := ORDER_SEQ.NEXTVAL;
+        V_CUSTOMERID := TRUNC(DBMS_RANDOM.VALUE(100002,105826));
+        V_EMPLOYEEID := TRUNC(DBMS_RANDOM.VALUE(1,10));
+        V_ORDERDATE := STARTDATE;
+        V_REQUIREDDATE := STARTDATE+7;
+        V_SHIPPEDDATE := STARTDATE+3;
+        V_SHIPVIA := TRUNC(DBMS_RANDOM.VALUE(1,7));
+        V_FREIGHT := ROUND(DBMS_RANDOM.VALUE(5.99,99.99),2);
+        INSERT INTO NEW_ORDERS VALUES(V_ORDERID,V_CUSTOMERID,V_EMPLOYEEID,
+        V_ORDERDATE,V_REQUIREDDATE,V_SHIPPEDDATE,V_SHIPVIA,V_FREIGHT);
+     END LOOP;
+     STARTDATE  := STARTDATE  + 1;
+ END LOOP;
+ DBMS_OUTPUT.PUT_LINE('COUNTER IS ' || COUNTER);
+END;
+/
+
+-- check table name or numbers of tables:
+SELECT TABLE_NAME FROM USER_TABLES;
+SELECT TABLE_NAME FROM TABS;
+
+-- check number of row in this table:
+SELECT COUNT(*) FROM NEW_ORDERS;
+
+
+
+
+-- ====================================================
+-- Step 1: Prepare temp_details table to store simulated order item data
+-- ====================================================
+
+-- Drop the temp_details table if it exists (clean start)
+DROP TABLE TEMP_DETAILS;
+
+-- Create temp_details table to store generated order item data
+CREATE TABLE TEMP_DETAILS(
+REC_NO NUMBER,
+ORDERID NUMBER,
+PRODUCTID NUMBER,
+UNITPRICE NUMBER,
+QUANTITY NUMBER,
+DISCOUNT NUMBER(3,2)
+);
+
+-- Delete any existing records from temp_details (in case table already populated)
+DELETE FROM TEMP_DETAILS;
+
+-- Enable output to console (for debugging or timing info)
+SET SERVEROUTPUT ON
+
+-- Display current time before data generation (for timing comparison)
+SELECT TO_CHAR(SYSDATE,'HH:MI:SS') 
+FROM DUAL;
+
+-- ================================================
+-- Step 2: Populate temp_details with random data for each order
+-- Each order has 1 to 5 items
+-- Each item has 1 to 10 quantities
+-- ================================================
+
+-- HOW TO DECLARE CURSOR?
+CURSOR <CURSOR_NAME> IS
+ <SELECT STATEMENT>
+
+-- Start PL/SQL block for generating random order item data
+DECLARE
+  -- Declare cursor to loop through each order in new_orders table
+  CURSOR ORDER_CUR IS
+    SELECT ORDERID FROM NEW_ORDERS;
+
+  -- Declare variables to use in the loop
+  COUNTER       NUMBER := 0;
+  V_NO_OF_ITEMS NUMBER(1);
+  V_PROD_ID     NUMBER;
+  V_UNITPRICE   NUMBER;
+  V_QUANTITY    NUMBER;
+  V_DISCOUNT    NUMBER(3,2);
+
+BEGIN
+  -- Loop through each order from the cursor
+  FOR ORDER_REC IN ORDER_CUR LOOP
+  
+    -- Randomly generate number of items for this order (1 to 5 items)
+    V_NO_OF_ITEMS := TRUNC(DBMS_RANDOM.VALUE(1,6));
+
+    -- Loop through each item to generate item details
+    FOR CTR IN 1..V_NO_OF_ITEMS LOOP
+      -- Increment the record counter
+      COUNTER := COUNTER + 1;
+
+      -- Generate random product ID (1 to 77)
+      V_PROD_ID := TRUNC(DBMS_RANDOM.VALUE(1,78));
+
+      -- Generate random quantity (1 to 10)
+      V_QUANTITY := TRUNC(DBMS_RANDOM.VALUE(1,11));
+
+      -- Generate random discount (between 0.05 and 0.70)
+      V_DISCOUNT := ROUND(DBMS_RANDOM.VALUE(0.05, 0.70),2);
+
+      -- Get unit price for this product from the products table
+      SELECT UNITPRICE INTO  V_UNITPRICE 
+      FROM PRODUCTS
+      WHERE PRODUCTID = V_PROD_ID;
+
+      -- Insert the generated item record into temp_details table
+     INSERT INTO TEMP_DETAILS VALUES(
+     COUNTER,                  -- rec_no
+     ORDER_REC.ORDERID,        -- orderid from cursor
+     V_PROD_ID,                -- randomly generated product ID
+     V_UNITPRICE,              -- unit price from products table
+     V_QUANTITY,               -- random quantity
+     V_DISCOUNT               -- random discount
+     );
+
+    -- End inner loop for items
+    END LOOP;
+  -- End outer loop for orders
+  END LOOP;
+END;
+/
+
+-- Display current time after data generation
+SELECT TO_CHAR(SYSDATE,'HH:MI:SS') 
+FROM DUAL;
+
+-- Count total number of rows in temp_details
+SELECT COUNT(*) FROM TEMP_DETAILS;
+
+-- Count number of distinct orderid-productid pairs (to find duplicates)
+SELECT COUNT(DISTINCT(ORDERID || PRODUCTID))
+FROM TEMP_DETAILS;
+
+292372 - 287429 = 4943
+
+-- If total rows > no_dup, there are duplicates
+
+-- =====================================================================
+-- Step 3: Extract records where the same product appears more than once in the same order
+-- =====================================================================
+
+-- Drop chk_duplicate table if it exists (to refresh it)
+
+
+-- VIEW ALL THE ORDERID WHGICH HAVING THE SAME PRODUCT ID MORE THAN 1 TIME IN THE SAME ORDER ID
+SELECT ORDERID
+FROM TEMP_DETAILS
+GROUP BY ORDERID
+HAVING COUNT(PRODUCTID) > COUNT(DISTINCT(PRODUCTID));
+
+-- HOW TO VIEW ALL THE DUPLICATE RECORD (DUP PRODUCT) IN TEMP_DETAILS?
+SELECT REC_NO, ORDERID || '-' || PRODUCTID AS ORDER_PRODUCT
+FROM TEMP_DETAILS 
+WHERE ORDERID IN 
+(
+SELECT ORDERID
+FROM TEMP_DETAILS
+GROUP BY ORDERID
+HAVING COUNT(PRODUCTID) > COUNT(DISTINCT(PRODUCTID))
+)
+ORDER BY ORDER_PRODUCT;
+
+==>> 20606
+
+
+
+-- Create chk_duplicate to store rows where a product is repeated in the same order
+CREATE TABLE CHK_DUPLICATE AS
+  SELECT REC_NO, ORDERID || '-' || PRODUCTID AS ORDER_PRODUCT
+    FROM TEMP_DETAILS 
+    WHERE ORDERID IN 
+    (
+    SELECT ORDERID
+    FROM TEMP_DETAILS
+    GROUP BY ORDERID
+    HAVING COUNT(PRODUCTID) > COUNT(DISTINCT(PRODUCTID))
+    )
+    ORDER BY ORDER_PRODUCT;
+
+  -- Create unique identifier per order-product pair
+    -- Subquery: Find orders where productid appears more than once
+
+-- Count how many potential duplicates are found
+SELECT COUNT(*)
+FROM CHK_DUPLICATE;
+
+-- Optional: Describe the structure of chk_duplicate table
+
+
+-- Set formatting for viewing ord_prod nicely in output
+COL ORDER_PRODUCT FORMAT A15
+
+
+-- View all the rows in chk_duplicate
+SELECT * FROM CHK_DUPLICATE;
+
+-- ============================================
+-- Step 4: Compare consecutive records to detect duplicates
+-- Store only the duplicate rec_no for deletion
+-- ============================================
+
+-- Drop delete_dup_row table if it exists
+DROP TABLE DELETE_DUP_ROW;
+
+-- Create table to store the rec_no of rows marked as duplicates
+CREATE TABLE DELETE_DUP_ROW
+(
+REC_NO NUMBER
+);
+  
+
+-- Start PL/SQL block to compare consecutive rows and flag duplicates
+DECLARE
+
+  -- Cursor to go through all rows in chk_duplicate (which is sorted by ord_prod)
+  CURSOR DUPLICATE_CUR IS
+    SELECT * FROM CHK_DUPLICATE;
+
+  -- Variables to store row data
+  V_REC_NO         NUMBER;       -- Record number
+  V_ORDER_PRODUCT1 VARCHAR(80);  -- Previous ord_prod
+  V_ORDER_PRODUCT2 VARCHAR(80);  -- Current ord_prod
+
+BEGIN
+  -- Open the cursor to begin fetching data
+  OPEN DUPLICATE_CUR; -- LOAD MEMORY
+
+  -- Fetch the first row (to initialize comparison)
+  FETCH DUPLICATE_CUR INTO V_REC_NO, V_ORDER_PRODUCT1;
+
+  -- Start looping through remaining rows
+  LOOP
+
+    -- Fetch the next row
+    FETCH DUPLICATE_CUR INTO V_REC_NO, V_ORDER_PRODUCT2;
+
+    -- Exit loop if no more rows
+    EXIT WHEN DUPLICATE_CUR%NOTFOUND;
+
+    -- If current ord_prod is the same as previous (duplicate found)
+    IF(V_ORDER_PRODUCT1=V_ORDER_PRODUCT2) THEN
+
+      -- Mark current rec_no for deletion
+      INSERT INTO DELETE_DUP_ROW VALUES(V_REC_NO);
+    ELSE
+      -- If not duplicate, move current value to previous
+      V_ORDER_PRODUCT1 := V_ORDER_PRODUCT2;
+    END IF;
+  END LOOP;
+  -- Close the cursor to free memory
+  CLOSE DUPLICATE_CUR;
+END;
+/
+
+
+
+-- Count how many rows were marked for deletion
+
+
+-- View all record numbers marked as duplicates
+
+
+-- View the order IDs related to duplicate records
+
+
+-- View detailed information about the duplicate products in the orders
+
+-- Commit changes before deletion (optional but safe practice)
+
+-- ====================================
+-- Step 5: Delete duplicate rows from temp_details
+-- ====================================
+
+-- Delete the rows marked as duplicates from temp_details
+
+
+-- =========================================
+-- Step 6: Create clean final table with proper constraints
+-- =========================================
+-- Drop the new_details table if it exists
+
+
+-- Create new_details table with primary and foreign key constraints
+
+
+-- Insert clean, non-duplicated data into new_details
+
+
+-- Check structure of related tables
+
+-- Question
+========
+
+-- What is the sales revenue ($) from each country?
+
+-- What is the sales revenue ($) from each country for the year 2023?
+
+-- What is the sales revenue ($) comparison for Year X vs Year Y (first 3 months)?
+-- Example: Compare Jan–Mar of 2022 vs Jan–Mar of 2023
+
+
+
+
+PRODUCT ID = 10001
+
+SELECT UNITPRCIE
+FROM PRODUCTS
+WHERE PRODUCTIDv = 10001;
+
+V_UNITPRICE
+
+SELECT UNITPRICE INTO  V_UNITPRICE 
+FROM PRODUCTS
+WHERE PRODUCTID = V_PROD_ID;
+
+
+
+SELECT MIN(PRODUCTID), MAX(PRODUCTID)
+FROM PRODUCTS;
