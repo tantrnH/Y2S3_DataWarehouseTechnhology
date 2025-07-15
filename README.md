@@ -1,8 +1,9 @@
 Generate Data
 --------
-prac2 - parents table
-prac3 - child table 
-prac4 - bridge table -> order details
+-- Practical 2 - GENERATE RANDOM RECORDS FOR PARENTS TABLE -- CUSTOMERS --> NEW_CUST
+-- Practical 3 - GENERATE RANDOM RECORDS FOR CHILD TABLE -- ORDERS --> NEW_ORDERS
+-- Practical 4 - GENERATE RANDOM RECORDS FOR BRIDGE TABLE (ASSOCIATIVE ENTITY) -- ORDER_DETAILS --> NEW_DETAILS
+-- Practical 5 - DATE DIMENSION TABLE (PROVIDE FROM DATE OF FACT TABLE) 
 
 generate 10 years data
 
