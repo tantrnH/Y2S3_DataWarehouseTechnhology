@@ -1,0 +1,234 @@
+==============================================
+select count(*) from new_cust; -- <= 5824
+select count(*) from new_orders; -- <= 98073
+select count(*) from new_details; -- <= 289226
+select table_name from tabs; -- 16 tables
+==============================================
+==============================================
+Step 1: Create the Date Dimension Table
+==============================================
+-- Create the table with fields related to calendar and time attributes
+CREATE TABLE DATE_DIM(
+    DATE_KEY            NUMBER       NOT NULL,       -- Primary key, running number
+    CAL_DATE            DATE         NOT NULL,       -- Actual calendar date
+    FULL_DESC           VARCHAR(40),                 -- Description like '2023 July 01
+    DAY_WEEK            NUMBER(1),                   -- Day of week (1 = Sunday, 7 = Saturday)
+    DAY_NUM_MONTH       NUMBER(2),                   -- Day number in the month (1-31)
+    DAY_NUM_YEAR        NUMBER(3),                   -- Day number in the year (1-366)
+    LAST_DAY_IND        CHAR(1),                     -- 'Y' if last day of the month, else 'N'
+    CAL_WEEK_END_DATE   DATE,                        -- End of the week date (Sunday)
+    CAL_WEEK_YEAR       NUMBER(2),                   -- Week number in the year (ISO week)
+    MONTH_NAME          VARCHAR(9),                  -- Full month name
+    CAL_MONTH_YEAR      NUMBER(2),                   -- Month number (1-12)
+    CAL_YEAR_MONTH      CHAR(7),                     -- Format like '2023-07'
+    CAL_QUARTER         CHAR(2),                     -- Quarter like 'Q1'
+    CAL_YEAR_QUARTER    CHAR(7),                     -- Format like '2023-Q1'
+    CAL_YEAR            NUMBER(4),                   -- Calendar year
+    HOLIDAY_IND         CHAR(1),                     -- 'Y' if holiday, else 'N'
+    WEEKDAY_IND         CHAR(1),                     -- 'Y' if weekday (Mon-Fri), else 'N'
+    FESTIVE_EVENT       VARCHAR(25),                 -- Optional description of event/holiday
+    CONSTRAINT DATE_DIM_PK PRIMARY KEY(DATE_KEY)              
+);
+==============================================
+Step 2: Create Sequence for Primary Key
+==============================================
+-- Drop sequence if exists and create a new one
+CREATE SEQUENCE DATE_SEQ
+   START WITH 100001
+   INCREMENT BY 1;
+
+==============================================
+Step 3: Populate the Table using PL/SQL Loop
+==============================================
+
+-- Use PL/SQL loop to insert records from 01-Jan-2000 to 31-Dec-2025
+DECLARE
+    -- Define the start and end date for the loop
+    STARTDATE DATE := TO_DATE('01/01/2000', 'DD/MM/YYYY'); 
+    ENDDATE   DATE := TO_DATE('31/12/2025', 'DD/MM/YYYY');
+    -- Variables to hold calculated calendar attributes
+    V_CAL_DATE           DATE;                          -- current date in loop
+    V_FULL_DESC          VARCHAR(40);                   -- e.g. “2024 July 13”
+    V_DAY_WEEK           NUMBER(1);                     -- day of week (1=Sunday .. 7=Saturday)
+    V_DAY_NUM_MONTH      NUMBER(2);                     -- day number in month (1–31)
+    V_DAY_NUM_YEAR       NUMBER(3);                     -- day number in year (1–366)
+    V_LAST_DAY_IND       CHAR(1);                       -- ‘Y’ if last day of month, else ‘N’
+    V_CAL_WEEK_END_DATE  DATE;                          -- date of the week’s end (Sunday)
+    V_CAL_WEEK_YEAR      NUMBER(2);                     -- ISO week number (01–52/53)
+    V_MONTH_NAME         VARCHAR(9);                    -- full month name (e.g. “JANUARY”)
+    V_CAL_MONTH_YEAR     NUMBER(2);                     -- numeric month (01–12)
+    V_CAL_YEAR_MONTH     CHAR(7);                       -- formatted “YYYY-MM”
+    V_CAL_QUARTER        CHAR(2);                       -- formatted “Q1”..“Q4”
+    V_CAL_YEAR_QUARTER   CHAR(7);                       -- formatted “YYYY-Q#”
+    V_CAL_YEAR           NUMBER(4);                     -- calendar year (e.g. 2024)
+    V_HOLIDAY_IND        CHAR(1);                       -- ‘Y’ if holiday, default ‘N’
+    V_WEEKDAY_IND        CHAR(1);                       -- ‘Y’ for Mon–Fri, else ‘N’
+    V_FESTIVE_EVENT      VARCHAR(25);                   -- optional event name (initially NULL)
+BEGIN
+    -- Loop through each day from startDate to endDate
+    WHILE(STARTDATE <= ENDDATE) LOOP
+        -- 1. Assign the loop date to v_CAL_DATE
+        V_CAL_DATE := STARTDATE;
+
+        -- 2. Build a human-readable description: Year Month DD
+        V_FULL_DESC := TO_CHAR(STARTDATE,'YEAR') ||' '|| TO_CHAR(STARTDATE,'MONTH') 
+                       ||' '||TO_CHAR(STARTDATE,'DD'); 
+ 
+        -- 3. Extract day-of-week (1=Sunday..7=Saturday)
+        V_DAY_WEEK  := TO_CHAR(STARTDATE, 'D');
+       
+        -- 4. Day-of-month and day-of-year
+        V_DAY_NUM_MONTH := TO_CHAR(STARTDATE, 'DD');
+        V_DAY_NUM_YEAR  := TO_CHAR(STARTDATE, 'DDD');
+       
+        -- 5. Determine if this date is the last of its month
+        IF(STARTDATE <> LAST_DAY(STARTDATE)) THEN
+            V_LAST_DAY_IND := 'N';
+        ELSE
+            V_LAST_DAY_IND := 'Y';
+        END IF;
+       
+        -- 6. Calculate the end-of-week date (assuming week ends on Sunday)
+        V_CAL_WEEK_END_DATE := STARTDATE + (7 - V_DAY_WEEK);
+       
+        -- 7. ISO week number, full month name, numeric month
+        V_CAL_WEEK_YEAR := TO_CHAR(STARTDATE,'IW');
+        V_MONTH_NAME := TO_CHAR(STARTDATE, 'MONTH');
+        V_CAL_MONTH_YEAR := TO_CHAR(STARTDATE, 'MM');
+       
+        -- 8. Quarter and year
+        V_CAL_QUARTER := 'Q' || TO_CHAR(STARTDATE,'Q');
+        V_CAL_YEAR    := TO_CHAR(STARTDATE,'YYYY'); 
+       
+        -- 9. Composite keys for easy grouping
+        V_CAL_YEAR_MONTH := V_CAL_YEAR|| '-' ||V_CAL_MONTH_YEAR;
+        V_CAL_YEAR_QUARTER := V_CAL_YEAR|| '-' ||V_CAL_QUARTER;
+
+        -- 10. Default holiday flag to ‘N’ (can update later)
+        V_HOLIDAY_IND := 'N';
+
+        -- 11. Mark weekdays (Mon–Fri)
+        IF (STARTDATE <> LAST_DAY(STARTDATE)) THEN
+          V_WEEKDAY_IND := 'N';
+        ELSE
+          V_WEEKDAY_IND := 'Y';
+        END IF;
+
+
+        -- 12. No festive event by default
+        V_FESTIVE_EVENT := NULL;
+
+
+        -- 13. Insert the assembled record into the date_dim table
+        INSERT INTO DATE_DIM VALUES(
+            DATE_SEQ.NEXTVAL,   -- auto-generated surrogate key
+            V_CAL_DATE,
+            V_FULL_DESC,
+            V_DAY_WEEK,
+            V_DAY_NUM_MONTH,
+            V_DAY_NUM_YEAR,
+            V_LAST_DAY_IND,
+            V_CAL_WEEK_END_DATE,
+            V_CAL_WEEK_YEAR,
+            V_MONTH_NAME,
+            V_CAL_MONTH_YEAR,
+            V_CAL_YEAR_MONTH,
+            V_CAL_QUARTER,
+            V_CAL_YEAR_QUARTER,
+            V_CAL_YEAR,
+            V_HOLIDAY_IND,
+            V_WEEKDAY_IND,
+            V_FESTIVE_EVENT
+        );
+        
+
+        -- 14. Advance to the next date
+        STARTDATE := STARTDATE + 1;
+    END LOOP;
+END;
+/
+
+    -- Optional: You could print a counter or completion message here
+    -- dbms_output.put_line('Date Dimension load complete');
+
+
+==========================================
+Questions
+==========================================
+-- how many records in date_dim table?
+SELECT COUNT(*) FROM DATE_DIM;
+  COUNT(*)
+----------
+      9497
+
+-- Write a query to list, for every date in 2023.
+SELECT * 
+FROM DATE_DIM 
+WHERE CAL_YEAR = 2023;
+
+-- Write a query to display SYSDATE along with: the day‑of‑year (DDD), the ISO week number (IW), and the calendar quarter (Q).
+
+
+-- Write a query to count the number of orders in Q1 2023 for each country.
+SELECT C.COUNTRY,  D.CAL_QUARTER, COUNT(*) NO_OF_ORDERS
+FROM NEW_CUST C 
+JOIN NEW_ORDERS O ON C.CUSTOMERID = O.CUSTOMERID
+JOIN DATE_DIM D ON O.ORDERDATE = D.CAL_DATE
+WHERE (CAL_YEAR = 2023)
+GROUP BY C.COUNTRY, D.CAL_QUARTER
+ORDER BY NO_OF_ORDERS DESC;
+
+SELECT * 
+FROM (
+    SELECT C.COUNTRY, D.CAL_QUARTER QUARTER_NO, COUNT(*) NO_OF_ORDERS
+    FROM NEW_CUST C
+    JOIN NEW_ORDERS O ON C.CUSTOMERID = O.CUSTOMERID
+    JOIN DATE_DIM D ON O.ORDERDATE = D.CAL_DATE
+    WHERE (CAL_YEAR = 2023)
+    GROUP BY C.COUNTRY, D.CAL_QUARTER
+    ORDER BY NO_OF_ORDERS DESC
+) PIVOT (
+    SUM(NO_OF_ORDERS)
+    FOR QUARTER_NO IN ('Q1','Q2', 'Q3', 'Q4')
+);
+
+-- LOGIC TO USE PIVOT // Use it in ASSIGNMENT
+SELECT *
+FROM (DATASET)
+PIVOT(
+  AGGREGATEFUNCTION(CULUMN)
+  FOR ROW-TO-TRANSFORM_TO-COL IN (DATA RANGE)
+);
+
+
+
+-- Display the total sales for year 2022, 2023, 2024, for month 1,2,3,4,5,6
+order_details = unitprice, productid, quantity, discount
+SELECT *
+FROM(
+    SELECT EXTRACT (YEAR FROM ORDERDATE) Year_No,
+    EXTRACT (MONTH FROM ORDERDATE) Month_No,
+    SUM(C.QUANTITY*C.UNITPRICE) Total_Revenue
+    FROM NEW_CUST    A 
+    JOIN NEW_ORDERS  B ON A.CUSTOMERID = B.customerID
+    JOIN NEW_DETAILS C ON B.ORDERID = C.ORDERID
+    WHERE (EXTRACT (YEAR FROM ORDERDATE) BETWEEN 2022 AND 2024) AND (EXTRACT (MONTH FROM ORDERDATE) BETWEEN 1 AND 6)
+    GROUP BY EXTRACT (YEAR FROM ORDERDATE), 
+             EXTRACT (MONTH FROM ORDERDATE)
+             ORDER BY Year_No, Month_No)
+    PIVOT(SUM(Total_Revenue)
+    FOR Month_No IN (1,2,3,4,5,6)
+);
+
+
+TO_CHAR(col,'999,999,999.99')
+===========================================
+TO-DO
+===========================================
+-- update 01 JAN 2023 as a holiday.
+
+
+
+PIVOT - Transform from ROW to COLUMN
+
+select table_name from tabs;
