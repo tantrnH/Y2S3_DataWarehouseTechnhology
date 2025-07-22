@@ -10,3 +10,6 @@ generate 10 years data
 [ Both Bring Home Test ]
 MID TERM (Week 8) ================ create table, create star skim
 Practical Test (Week 9) ========== 
+
+[Assignment]
+- Use PIVOT 
