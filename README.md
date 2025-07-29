@@ -14,9 +14,9 @@ generate 10 years data
 
 [ Both Bring Home Test ]
 ------------------------
-MID TERM (Week 8) ================ create table, create star skim  (one article one question)
+MID TERM (Week 8) ================ create table, create star skim  (one article one question) -- nlecture note CHP 1,2,3
 
-Practical Test (Week 9) ========== 
+Practical Test (Week 9) ========== Practical 6 (29July2025)
 
 
 
