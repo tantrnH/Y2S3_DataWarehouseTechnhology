@@ -23,4 +23,4 @@ Practical Test (Week 9) ========== Practical 6 (29July2025)
 [Assignment]
 ------------
 - Use PIVOT 
-- Query, Report, Visualie Data, Decision Making
+- Query(report in last semester), Report(5WH), Visualie Data, Decision Making
