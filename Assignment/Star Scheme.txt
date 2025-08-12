@@ -1,0 +1,118 @@
+DIM_Member
+- Member_KEY (PK)
+- MemberID
+- Gender
+- DOB
+- State 
+- City
+- RegistrationDate
+- RenewalDate
+- ExpiredDate
+- AcquisitionSource
+- MembersipStatus
+- LoanDuration
+- MaxBookLoan
+- MaxReservation
+- Eff_Start_Date
+- Eff_End_Date
+- Current_Flag
+
+DIM_Staff
+- Staff_KEY (PK)
+- StaffID
+- DOB
+- State 
+- City
+- HiredDate
+- LeaveDate
+- StaffStatus
+- Eff_Start_Date
+- Eff_Start_Date
+- Current_Flag
+
+FACT_BookLoan
+- Member_KEY (PK,FK)
+- BookTitle_KEY (PK,FK)
+- Staff_KEY (PK,FK)
+- LoanDate_KEY (PK,FK)
+- BookLoanID (PK, FK)
+- LoanDays
+- LoanStatus
+- ReturnBookCondition
+- Review
+- FineType
+- FineAmountPerDay
+- OverdueDays
+- DamagedMissingFine
+- TotalFineAmount
+
+FACT_Reservation
+- Member_KEY (PK,FK)
+- BookTitle_KEY (PK,FK)
+- Staff_KEY (PK,FK)
+- ReservationDate_KEY (PK,FK)
+- ReservationID (PK,FK)
+- ReservationStatus
+- Review
+- ReserveToReadyDays
+- ReadyToSuccessDays
+- TotalDays
+
+DIM_Date
+- Date_KEY (PK)
+- Cal_Date
+- Full_Desc
+- Day_week
+- Day_Num_Month
+- Day_Num_Year
+- Last_Day_Ind
+- Cal_Week_End_Date
+- Cal_Week_Year
+- Month_Name
+- Cal_Month_Year
+- Cal_Year_Month
+- Cal_Quarter
+- Cal_Year_Quarter
+- Cal_Year
+- Holiday_Ind
+- Weekday_Ind
+- Festive_Event
+
+DIM_BookTitle
+- BookTitle_KEY
+- BookTitleID
+- AuthorIDs
+- GenrelIDs
+- PublicationYear
+- Language
+- Edition
+- Popularity
+- Eff_Start_Date
+- Eff_End_Date
+- Current_Flag
+
+FACT_BookOrder
+- BookTitle_KEY (PK,FK)
+- Supplier_KEY (PK,FK)
+- Shipper_KEY (PK,FK)
+- OrderDate_KEY (PK,FK)
+- OrderID (PK,FK)
+- OrderStatus
+- WaitingDays
+- UnitPrice
+- Quantity
+- Discount
+- TotalPrice
+
+DIM_Supplier
+- Supplier_KEY (PK)
+- SupplierID
+- SupplierType
+- State
+- Country
+
+DIM_Shipper
+- Shipper_KEY (PK)
+- ShipperID
+- State
+- Country

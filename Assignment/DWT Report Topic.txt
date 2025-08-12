@@ -1,0 +1,59 @@
+DWT Report Topic
+
+Membership Type Limit & Utilization Report: 
+This report would analyze how different membership limits (e.g., MaxBookLoan, MaxReservation) are utilized by members.
+Facts: FACT_BookLoan, FACT_Reservation
+Dimensions: DIM_Member, DIM_BookTitle
+Potential Metrics: Average number of books borrowed per member (by type) compared to their MaxBookLoan limit, average number of reservations per member (by type) compared to their MaxReservation limit, percentage of members who regularly hit their loan/reservation limits, analysis of LoanDuration by membership type.
+
+Overdue & Return Behavior Analysis Report
+（FACT_BookLoan + DIM_Date + DIM_Member + DIM_BookTitle）
+分析会员的还书行为，包括逾期率、平均逾期天数、按会员类型和地区的差异。
+按时间（月份/季度）追踪逾期趋势，找出高风险时段。
+结合书籍类别分析哪些类型的书最容易被逾期归还。
+
+Staff Performance Report: 
+This report could analyze the efficiency and productivity of library staff.
+Facts: FACT_BookLoan, FACT_Reservation
+Dimensions: DIM_Staff, DIM_Date, DIM_Member
+Potential Metrics: Number of books loaned/returned per staff member, average time to process a reservation, staff-to-member interaction count, loan processing errors.
+
+
+
+====================================================
+Topic 1: Mambership Type Limit & Utilization Report
+====================================================
+1. WHO 
+-- This report will analyze member's membership 
+
+2. WHAT 
+-- The report analyze different membership type's limits (e.g., MaxBookLoan, MaxReservation, LoanDuration) are utilized by members.
+   - Overdue Rate in each quater and year 
+   - Average OverdueDays of each membership type
+   - Average number of books borrowed in each membership type
+   - Calculate different membership type's MaxReservation and the number of bookLoan successfull record
+   - Calculate different membership type's MaxBookLoan and the Overdue Rate in each quater and year
+   - Calculate different membership type's LoanDuration and the OverdueDays in a month, quarter, year 
+
+3. WHERE 
+-- DIM_Member
+-- FACT_BookLoan
+-- FACT_Reservation 
+-- DIM_DATE 
+
+4. WHEN
+-- analyze per quater, year different membership type 
+
+5. WHY
+
+6. HOW
+
+====================================================
+Topic 2: Overdue & Return Behavior Analysis Report
+====================================================
+
+
+
+====================================================
+Topic 3: Staff Performance Report: 
+====================================================
