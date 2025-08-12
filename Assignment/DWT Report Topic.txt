@@ -31,9 +31,9 @@ Topic 1: Mambership Type Limit & Utilization Report
    - Overdue Rate in each quater and year 
    - Average OverdueDays of each membership type
    - Average number of books borrowed in each membership type
-   - Calculate different membership type's MaxReservation and the number of bookLoan successfull record
-   - Calculate different membership type's MaxBookLoan and the Overdue Rate in each quater and year
-   - Calculate different membership type's LoanDuration and the OverdueDays in a month, quarter, year 
+   - Calculate and compare different membership type's MaxReservation and each membership type's number of bookLoan successfull record 
+   - Calculate and compare different membership type's MaxBookLoan and each membership type's Overdue Rate in each quater and year
+   - Calculate and compare different membership type's LoanDuration and each membership type's OverdueDays in a month, quarter, year 
 
 3. WHERE 
 -- DIM_Member
@@ -56,4 +56,5 @@ Topic 2: Overdue & Return Behavior Analysis Report
 
 ====================================================
 Topic 3: Staff Performance Report: 
+
 ====================================================
