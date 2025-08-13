@@ -45,6 +45,7 @@ Topic 1: Mambership Type Limit & Utilization Report
 -- analyze per quater, year different membership type 
 
 5. WHY
+-- 为了找出最合理的membership types limits，提高member忠诚度，降低overdue rate
 
 6. HOW
 
@@ -58,3 +59,4 @@ Topic 2: Overdue & Return Behavior Analysis Report
 Topic 3: Staff Performance Report: 
 
 ====================================================
+
