@@ -48,6 +48,11 @@ Topic 1: Mambership Type Limit & Utilization Report
 -- 为了找出最合理的membership types limits，提高member忠诚度，降低overdue rate
 
 6. HOW
+-- Calculate the average of bookLoan and bookReservation in all membership record as Average Utilisation Rate, find out the average bookLoan in a Month/Quarter/Year and average LoanDuration in a booLoan record
+-- Compare the bookLoan and bookReservation record with the member's MaxBookLoan and MaxReservation as Member Utilisation Rate
+-- find out member that member utilisation rate that higher than 90%, and find out which membership type member need to increase their MaxBookLoan and MaxReservation
+-- Calculate the overdue rate from all member record as Average Overdue
+-- find out the overdue rate for each membership type, and compare which membership type overdue rate is higher than Average Overdue, check the high average membership type's total number of bookLoan record and average LoanDuration in this membership type, to determine do we need to decrease the membership MaxBookLoan or increase the membership LoanDuration based on comparing with the AvarageUtilisationBookLoan and AverageUtilisationLoanDuration.
 
 ====================================================
 Topic 2: Overdue & Return Behavior Analysis Report
@@ -59,4 +64,5 @@ Topic 2: Overdue & Return Behavior Analysis Report
 Topic 3: Staff Performance Report: 
 
 ====================================================
+
 
