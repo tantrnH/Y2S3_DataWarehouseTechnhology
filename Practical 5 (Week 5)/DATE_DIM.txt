@@ -113,6 +113,24 @@ BEGIN
         ELSE
           V_WEEKDAY_IND := 'Y';
         END IF;
+----------------------------------------------------------------------------Need to check with teacher, for number 11. Mark weekdays(Mon-Fri)
+-- ISO day-of-week: 1=Monday ... 7=Sunday
+IF TO_CHAR(STARTDATE, 'D', 'NLS_TERRITORY=CHINA') BETWEEN 1 AND 5 THEN
+  V_WEEKDAY_IND := 'Y';
+ELSE
+  V_WEEKDAY_IND := 'N';
+END IF;
+----------------------------------------------------------------------------
+OR
+----------------------------------------------------------------------------
+-- 强制用英文缩写判断，不受地区影响
+IF TO_CHAR(STARTDATE, 'DY', 'NLS_DATE_LANGUAGE=ENGLISH') 
+       IN ('MON','TUE','WED','THU','FRI') THEN
+  V_WEEKDAY_IND := 'Y';
+ELSE
+  V_WEEKDAY_IND := 'N';
+END IF;
+----------------------------------------------------------------------------
 
 
         -- 12. No festive event by default
@@ -230,5 +248,6 @@ TO-DO
 
 
 PIVOT - Transform from ROW to COLUMN
+
 
 select table_name from tabs;
