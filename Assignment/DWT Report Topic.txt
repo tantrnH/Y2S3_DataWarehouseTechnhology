@@ -57,12 +57,22 @@ Topic 1: Mambership Type Limit & Utilization Report
 ====================================================
 Topic 2: Overdue & Return Behavior Analysis Report
 ====================================================
+1. WHO
+-- This report will analyze member's overdue record
 
+2. WHAT
+-- The report will analyze member return books record, overdue rate, avarage overdue OverdueDays
+-- This report will conpare and contrast different area or different membership type's overdue record
+3. WHERE
+4. WHEN
+5. WHY
+6. HOW
 
 
 ====================================================
 Topic 3: Staff Performance Report: 
 
 ====================================================
+
 
 
