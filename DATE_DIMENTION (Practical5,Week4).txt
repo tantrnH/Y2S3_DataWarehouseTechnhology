@@ -47,7 +47,7 @@ CREATE SEQUENCE DATE_SEQ
     INCREMENT BY 1;
 
 ==============================================
-Step 3: Populate the Table using PL/SQL Loop
+Step 3: Populate填充 the Table using PL/SQL Loop
 ==============================================
 
 -- Use PL/SQL loop to insert records from 01-Jan-2000 to 31-Dec-2025
