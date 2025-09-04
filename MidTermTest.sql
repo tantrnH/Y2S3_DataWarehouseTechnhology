@@ -1,4 +1,73 @@
-/* =================================== Create Dimension Tables =================================== */
+/* =================================== a) Create Dimension Tables =================================== */
 
-/* 1) DIM_DATE */
-CREATE TABLE DIM_DATE (
+CREATE TABLE STUDENT_DIM (
+    S_KEY                     NUMBER          NOT NULL,
+    S_ID                      NUMBER          NOT NULL,
+    S_NAME                    VARCHAR2(25)    NOT NULL,
+    S_DOB                     DATE            NOT NULL,
+    S_CITY                    VARCHAR2(15)    NOT NULL,
+    S_STATE                   VARCHAR2(15)    NOT NULL,
+    S_COUNTRY                 VARCHAR2(15)    NOT NULL,
+    S_DATE_JOINED             DATE            NOT NULL,
+    S_CGPA                    NUMBER(3,2)     NOT NULL,
+    S_FACULTY_ENROLLED        VARCHAR2(20)    NOT NULL,
+    S_HIGHTEST_QUALIFICATION  VARCHAR2(15)    NOT NULL,
+    CONSTRAINT STUDENT_DIM_PK PRIMARY KEY(S_KEY)
+);
+
+CREATE SEQUENCE STUDENT_DIM_SEQ START WITH 1234 INCREMENT BY 1;
+
+CREATE TABLE COURSE_DIM (
+    COURSE_KEY              NUMBER          NOT NULL,  
+    COURSE_ID               NUMBER          NOT NULL,
+    FACULTY_NAME            VARCHAR2(25)    NOT NULL,
+    MAX_CAPACITY            NUMBER          NOT NULL,
+    NO_ENROLLED             NUMBER          NOT NULL,
+    EFFECTIVE_START_DATE    DATE            NOT NULL,
+    EFFECTIVE_END_DATE      DATE            NOT NULL,
+    CONSTRAINT COURSE_DIM_PK PRIMARY KEY(COURSE_KEY)
+);
+
+CREATE SEQUENCE COURSE_DIM_SEQ START WITH 1234 INCREMENT BY 1;
+
+CREATE TABLE DATE_DIM (
+    DATE_KEY            NUMBER          NOT NULL,
+    CAL_DATE            DATE            NOT NULL,
+    ACAD_YEAR           NUMBER          NOT NULL,
+    FULL_DESC           VARCHAR2(40),  
+    DAY_WEEK            NUMBER(1),
+    DAY_NUM_MONTH       NUMBER(2),
+    DAY_NUM_YEAR        NUMBER(3),
+    LAST_DAY_IND        CHAR(1),
+    CAL_WEEK_END_DATE   DATE,
+    CAL_WEEK_YEAR       NUMBER(2),
+    MONTH_NAME          VARCHAR2(9),
+    CAL_MONTH_YEAR      NUMBER(2),
+    CAL_YEAR_MONTH      CHAR(7),
+    CAL_QUARTER         CHAR(2),
+    CAL_YEAR_QUARTER    CHAR(7),
+    CAL_YEAR            NUMBER(4),
+    HOLIDAY_IND         CHAR(1),
+    WEEKDAY_IND         CHAR(1),     
+    CONSTRAINT DATE_DIM_PK PRIMARY KEY(DATE_KEY)
+);
+
+CREATE TABLE ENROLLMENT_FACT(
+    S_KEY           NUMBER  NOT NULL,
+    COURSE_KEY      NUMBER  NOT NULL,
+    DATE_KEY        NUMBER  NOT NULL,
+    SE_ID           NUMBER  NOT NULL,
+    ACAD_SESSION    NUMBER(6)   NOT NULL,
+    GRADE           VARCHAR2(3) NOT NULL,     
+    FEE_PER_CREDIT  NUMBER(6,2) NOT NULL,
+    CREDIT_HOUR     NUMBER(3),
+    TOTAL_FEES      NUMBER(8,2) NOT NULL,
+    PASS_FLAG       CHAR(1),
+    CONSTRAINT EF_PK PRIMARY KEY(S_KEY, COURSE_KEY, DATE_KEY, SE_ID),
+    CONSTRAINT EF_COURSE_FK FOREIGN KEY(COURSE_KEY) REFERENCES COURSE_DIM(COURSE_KEY),
+    CONSTRAINT EF_DATE_FK FOREIGN KEY(DATE_KEY) REFERENCES DATE_DIM(DATE_KEY),
+    CONSTRAINT EF_S_FK FOREIGN KEY(S_KEY) REFERENCES STUDENT_DIM(S_KEY),
+    CONSTRAINT EF_SE_FK FOREIGN KEY(SE_ID) REFERENCES Semester_Enrollment(SE_ID)
+);
+
+/* =================================== b) UPDATE ACADEMIC YEAR =================================== */
