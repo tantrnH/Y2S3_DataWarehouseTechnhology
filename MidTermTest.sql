@@ -1,4 +1,4 @@
-/* =================================== a) Create Dimension Tables =================================== */
+/* =================================== 1) Create Dimension Tables =================================== */
 
 CREATE TABLE STUDENT_DIM (
     S_KEY                     NUMBER          NOT NULL,
@@ -70,4 +70,13 @@ CREATE TABLE ENROLLMENT_FACT(
     CONSTRAINT EF_SE_FK FOREIGN KEY(SE_ID) REFERENCES Semester_Enrollment(SE_ID)
 );
 
-/* =================================== b) UPDATE ACADEMIC YEAR =================================== */
+/* =================================== 2) UPDATE ACADEMIC YEAR =================================== */
+
+UPDATE DATE_DIM d
+SET acad_year = CASE
+  WHEN d.CAL_DATE BETWEEN DATE '2025-06-16' AND DATE '2026-04-25' THEN '2025/26'
+  WHEN d.CAL_DATE BETWEEN DATE '2026-06-29' AND DATE '2027-04-24' THEN '2026/27'
+  ELSE d.ACAD_YEAR
+END;
+
+/* =================================== 3) Initial Loading for Fact Table =================================== */
