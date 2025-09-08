@@ -61,13 +61,20 @@ Topic 2: Overdue & Return Behavior Analysis Report
 -- This report will analyze member's overdue record
 
 2. WHAT
--- The report will analyze member return books record, overdue rate, avarage overdue OverdueDays
--- This report will conpare and contrast different area or different membership type's overdue record
+-- The report will analyze what is the common ground of the overdue records and propose the solutions, analyze based on DATE or AGE or MEMBERSHIP TYPE
+
 3. WHERE
+-- FACT_BookLoan 
+-- DIM_Date 
+-- DIM_Member 
+-- DIM_BookTitle
+
 4. WHEN
+-- analyze on each month quater and year and holidays or special festivals what kind of member have the most overdue record
 5. WHY
 6. HOW
-
+-- The report will analyze member return books record, overdue rate, avarage overdue OverdueDays
+-- This report will conpare and contrast different area or different membership type's overdue record
 
 ====================================================
 Topic 3: Staff Performance Report: 
