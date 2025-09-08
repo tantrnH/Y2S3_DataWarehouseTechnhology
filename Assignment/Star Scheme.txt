@@ -4,12 +4,13 @@ DIM_Member
 - Gender
 - DOB
 - State 
-- City
+- District
 - RegistrationDate
 - RenewalDate
 - ExpiredDate
 - AcquisitionSource
-- MembersipStatus
+- MembershipStatus
+- MembershipType
 - LoanDuration
 - MaxBookLoan
 - MaxReservation
@@ -22,7 +23,8 @@ DIM_Staff
 - StaffID
 - DOB
 - State 
-- City
+- District
+- Salary
 - HiredDate
 - LeaveDate
 - StaffStatus
@@ -86,7 +88,6 @@ DIM_BookTitle
 - PublicationYear
 - Language
 - Edition
-- Popularity
 - Eff_Start_Date
 - Eff_End_Date
 - Current_Flag
@@ -109,10 +110,12 @@ DIM_Supplier
 - SupplierID
 - SupplierType
 - State
+- District
 - Country
 
 DIM_Shipper
 - Shipper_KEY (PK)
 - ShipperID
+- ShipperName
 - State
 - Country
