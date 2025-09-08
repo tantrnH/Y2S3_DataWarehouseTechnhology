@@ -61,7 +61,7 @@ Topic 2: Overdue & Return Behavior Analysis Report
 -- This report will analyze member's overdue record
 
 2. WHAT
--- The report will analyze what is the common ground of the overdue records and propose the solutions, analyze based on DATE or AGE or MEMBERSHIP TYPE
+-- Identify common patterns of overdue behavior, focusing on time dimensions (month, quarter, academic year, holidays), and optionally comparing membership type as supporting analysis.
 
 3. WHERE
 -- FACT_BookLoan 
@@ -70,16 +70,49 @@ Topic 2: Overdue & Return Behavior Analysis Report
 -- DIM_BookTitle
 
 4. WHEN
--- analyze on each month quater and year and holidays or special festivals what kind of member have the most overdue record
+-- Compare overdue behavior across months, quarters, academic years, holidays and special festivals.
+
 5. WHY
+-- To help the library identify high-risk periods for overdue returns, so preventive measures and reminder strategies can be applied.
+
 6. HOW
--- The report will analyze member return books record, overdue rate, avarage overdue OverdueDays
--- This report will conpare and contrast different area or different membership type's overdue record
+-- Calculate overdue rate and average overdue days by time period, then compare trends to identify when overdue peaks occur.
+
+-- The report will based on a month/quater/year member return books record, calculate the overdue rate and avarage overdue OverdueDays 
+-- compare the overdue record in each month/quater/year find out when will be the overdue highest period
+
+
 
 ====================================================
-Topic 3: Staff Performance Report: 
-
+Topic 3: Staff Performance Report
 ====================================================
+
+1. WHO
+-- This report focuses on the library staff.
+
+2. WHAT
+-- The purpose is to analyze whether staff performance aligns with their salary levels, 
+   to identify underperforming staff for improvement, and to reward high-performing staff appropriately.
+
+3. WHERE
+-- FACT_BookLoan
+-- FACT_Reservation
+-- DIM_Staff
+-- DIM_Date
+-- DIM_Member
+
+4. WHEN
+-- Based on results over the past quarter and the past year, evaluated on a monthly basis.
+
+5. WHY
+-- To ensure the efficient allocation of labor costs and optimize the use of human resources.
+
+6. HOW
+-- Calculate the average number of reservation and book loan records processed per staff per month.
+-- Identify staff who, in more than half of the months in the past quarter or year, processed 
+   below the overall average workload (i.e., underperforming staff).
+-- Identify the top three staff members with the highest processed records over the past year.
+
 
 
 
